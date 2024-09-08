@@ -1,0 +1,66 @@
+.data
+mes1: .asciiz "\n"
+mes2: .asciiz "0x"
+mes3: .asciiz "0x"
+.text
+
+li $v0,5
+syscall
+add $s3, $v0, $0             # s3 chua dau vao
+add $a0,$v0,$0
+li $s7,2
+add $s1,$0,$0  #i=0
+  loop1:
+div $a0,$s7
+mfhi $t0                     # $t0 ch?a s? d?
+mflo $t1 			#t1 ch?a nguyên
+sw  $t0,0($sp)
+beq $t1,$0,end_loop1
+subi $sp,$sp,4
+add $a0,$0,$t1
+addi $s1,$s1,1  #i=i+1
+j loop1
+end_loop1:
+
+# chuyen sang he 16
+
+add $a0, $0, $s3
+li $s7,16
+add $s1,$0,$0  #i=0
+  loop2:
+div $a0,$s7
+mfhi $t0                     # $t0 ch?a s? d?
+mflo $t1 			#t1 ch?a nguyên
+sw  $t0,0($sp)
+beq $t1,$0,end_loop2
+subi $sp,$sp,4
+add $a0,$0,$t1
+addi $s1,$s1,1  #i=i+1
+j loop2
+end_loop2:
+
+li $v0, 4
+la $a0, mes3
+syscall
+
+printHexa:
+            
+            slti $t1,$s1,0
+            beq $t1,1,exit2
+            lw $a0,0($sp)
+            slti $t0, $a0, 10
+            beq $t0, $0, else
+            li $v0,1
+            syscall
+            j end_if
+            else:
+                  addi $a0, $a0, -10 
+                  addi $a0, $a0, 'A'
+                  li $v0, 11
+                  syscall
+            end_if:
+
+            subi $s1,$s1,1
+            addi $sp,$sp,4
+            j printHexa
+exit2:
